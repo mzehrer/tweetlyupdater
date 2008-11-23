@@ -8,7 +8,7 @@ Tweetly Updater requires PHP 5 >= 5.2.0 and the curl module for PHP.
 
 = Details =
 
-* Unzip the release archive to yout Wordpress plugin directory
-* Activate the plugin on the plugin management page
-* Go to _Settings->Tweetly Updater_ and fill in your twitter an bit.ly login information. 
-* Enjoy...
+  * Unzip the release archive to yout Wordpress plugin directory
+  * Activate the plugin on the plugin management page
+  * Go to _Settings->Tweetly Updater_ and fill in your twitter an bit.ly login information. 
+  * Enjoy...
