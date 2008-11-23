@@ -54,7 +54,7 @@ class TweetlyUpdater {
         $shortUrl = $longurl;
     
         if($this->bitlyUser != '' && $this->bitlyApiKey != '') {
-            $bitlyObject = json_decode($this->curlGet($this->bitlyApiUrl . "/shorten?version=" . $this->bitlyApiVersion . "&long_url=" . $longurl, $this->bitlyUser, $this->bitlyApiKey));
+            $bitlyObject = json_decode($this->curlGet($this->bitlyApiUrl . "/shorten?version=" . $this->bitlyApiVersion . "&history=1&long_url=" . $longurl, $this->bitlyUser, $this->bitlyApiKey));
             if ($bitlyObject->{'statusCode'} == 'OK') {
                 $shortUrl = $bitlyObject->{'results'}->{$longurl}->{'hashUrl'}; 	
             } else {
