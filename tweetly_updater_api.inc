@@ -21,9 +21,12 @@ class TweetlyUpdater {
     }
 
     public function twitterVerifyCredentials() {
-        $twObject = json_decode($this->curlGet($this->twitterApiUrl . "/account/verify_credentials.json",  $this->twittereUser, $this->twitterPassword));
-        if ($twObject->{'authorized'}) {
+        $twResp = $this->curlGet($this->twitterApiUrl . "/account/verify_credentials.json",  $this->twittereUser, $this->twitterPassword);
+        $twObject = json_decode($twResp);
+        if ($twObject->{'name'}) {
                 return true;
+        } else {
+                error_log("Twitter auth failed: " . $twResp);    
         }
         return false;
     }
@@ -43,7 +46,7 @@ class TweetlyUpdater {
     }
     
     public function bitlyVerifyCredentials() {
-        $bitlyObject = json_decode($this->curlGet($this->bitlyApiUrl . "/shorten?version=" . $this->bitlyApiVersion . "&long_url=http://zepan.org" , $this->bitlyUser, $this->bitlyApiKey));
+        $bitlyObject = json_decode($this->curlGet($this->bitlyApiUrl . "/shorten?version=" . $this->bitlyApiVersion . "&longUrl=http://zepan.org&login=" . $this->bitlyUser . "&apiKey=" . $this->bitlyApiKey , '', ''));
         if ($bitlyObject->{'statusCode'} == 'OK') {
             return true;	
         }
@@ -54,9 +57,10 @@ class TweetlyUpdater {
         $shortUrl = $longurl;
     
         if($this->bitlyUser != '' && $this->bitlyApiKey != '') {
-            $bitlyObject = json_decode($this->curlGet($this->bitlyApiUrl . "/shorten?version=" . $this->bitlyApiVersion . "&history=1&long_url=" . $longurl, $this->bitlyUser, $this->bitlyApiKey));
+            $bitlyResp = $this->curlGet($this->bitlyApiUrl . "/shorten?version=" . $this->bitlyApiVersion . "&history=1&longUrl=" . $longurl . "&login=" . $this->bitlyUser . "&apiKey=" . $this->bitlyApiKey, '', '');
+            $bitlyObject = json_decode($bitlyResp);
             if ($bitlyObject->{'statusCode'} == 'OK') {
-                $shortUrl = $bitlyObject->{'results'}->{$longurl}->{'hashUrl'}; 	
+                $shortUrl = $bitlyObject->{'results'}->{$longurl}->{'shortUrl'}; 	
             } else {
                 error_log("bit.ly shorten request failed");                
             }

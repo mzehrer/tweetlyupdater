@@ -96,7 +96,7 @@
 		<input type="password" name="twitterpw" id="twitterpw" value="<?php if(get_option('tweetlyUpdater_twitterpw') !=''){echo("********");}?>" />
 		</p>
 		<input type="hidden" name="submit-type" value="login">
-		<p><input type="submit" name="submit" value="save login" /></p>
+		<p><input type="submit" name="submit" class="button-primary" value="save login" /></p>
 		<p><strong>Don't have a Twitter account? <a href="http://www.twitter.com">Get one for free here!</a></strong></p>
 	</div>
 	</form>
@@ -121,7 +121,7 @@
 			<input type="text" name="bitlyapikey" id="bitlyapikey" value="<?php if(get_option('tweetlyUpdater_bitlyapikey') !=''){echo("-- not shown --");}?>" />
 			</p>
 			<input type="hidden" name="submit-type" value="bitly">
-			<p><input type="submit" name="submit" value="save login" /></p>
+			<p><input type="submit" name="submit" class="button-primary" value="save login" /></p>
 			<p><strong>Don't have a bit.ly account? <a href="http://bit.ly/">Sign up!</a></strong></p>
 		</div>
 		</form>
@@ -162,7 +162,7 @@
 		</fieldset>
 
 		<input type="hidden" name="submit-type" value="options">
-		<input type="submit" name="submit" value="save options" />
+		<input type="submit" name="submit" class="button-primary" value="save options" />
 	</div>
 	</form>
 

@@ -3,7 +3,7 @@
 Plugin Name: Tweetly Updater
 Plugin URI: http://www.zepan.org/software/tweetly-updater
 Description: Updates Twitter when you create or edit a blog entry, uses bit.ly for short urls
-Version: 1.0.0
+Version: 1.1.0
 Author: Michael Zehrer
 Author URI: http://zepan.org
 */
