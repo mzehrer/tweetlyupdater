@@ -4,7 +4,7 @@ Donate link: http://www.zepan.org/software/
 Tags: twitter, bitly, posting
 Requires at least: 2.0.2
 Tested up to: 2.7
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 
 This plugin sends Twitter updates on new or edited posts, uses bit.ly.
 

@@ -3,7 +3,7 @@
 Plugin Name: Tweetly Updater
 Plugin URI: http://www.zepan.org/software/tweetly-updater
 Description: Updates Twitter when you create or edit a blog entry, uses bit.ly for short urls
-Version: 1.1.0
+Version: 1.1.1
 Author: Michael Zehrer
 Author URI: http://zepan.org
 */
@@ -50,37 +50,42 @@ function triggerTweet($post_ID)  {
 	
 	$sentence = "";
         
-        $thisPostPreviousStatus = $_POST['prev_status'];
-	        
-        if ($thisPostPreviousStatus == 'publish') {
-            if(get_option('oldpost-edited-update') == '1') {
-                $sentence = get_option('oldpost-edited-text');
+	$metaShortLink = get_post_meta($post_ID, "tweetlyUpdater_bitlyUrl", true);
+
+        if ($metaShortLink) {
+		//error_log("This is an update");
+            if(get_option('tweetlyUpdater_oldpost-edited-update') == '1') {
+                $sentence = get_option('tweetlyUpdater_oldpost-edited-text');
                 if (strlen(trim($thisposttitle)) == 0) {
                         $post = get_post($post_ID);
                         if ($post) {
                                 $thisposttitle = $post->post_title;
                         }
                 }
-                if(get_option('oldpost-edited-showlink') == '1') {
+                if(get_option('tweetlyUpdater_oldpost-edited-showlink') == '1') {
                         $thisposttitle = $thisposttitle . ' @' . $shortlink;
                 }
                 $sentence = str_replace ( '#title#', $thisposttitle, $sentence);
             }
         } else {
-            if(get_option('newpost-published-update') == '1'){
-                $sentence = get_option('newpost-published-text');
-                if(get_option('newpost-published-showlink') == '1'){
+		//error_log("This is a new post");
+            if(get_option('tweetlyUpdater_newpost-published-update') == '1'){
+                $sentence = get_option('tweetlyUpdater_newpost-published-text');
+                if(get_option('tweetlyUpdater_newpost-published-showlink') == '1'){
                     $thisposttitle = $thisposttitle . ' @' . $shortlink;
                 }
                 $sentence = str_replace ( '#title#', $thisposttitle, $sentence);
             }
         }
-        
+
 	if($sentence != ""){
 		$status = utf8_encode($sentence);
 		$res = $tweetlyUpdater->twitterUpdate($status);
 		if ($res == null) {
 			error_log("Twitter update failed");
+		} else {
+			if (!add_post_meta($post_ID, "tweetlyUpdater_bitlyUrl", $shortlink, false))
+				error_log("Could not add bitly url to meta data");
 		}
 	}
 	return $post_ID;
