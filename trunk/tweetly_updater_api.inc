@@ -32,6 +32,7 @@ class TweetlyUpdater {
     }
     
     public function twitterUpdate($message) {
+        //error_log("Sending twitter update");
         $fields = array(    
             'status'=>urlencode($message),
             'source'=>$this->twitterSource
