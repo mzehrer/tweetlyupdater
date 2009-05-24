@@ -79,7 +79,7 @@ function triggerTweet($post_ID)  {
 	}
 
 	if($sentence != ""){
-		$status = utf8_encode($sentence);
+		$status = $sentence;
 		$res = $tweetlyUpdater->twitterUpdate($status);
 		if ($res == null) {
 			error_log("Twitter update failed");
