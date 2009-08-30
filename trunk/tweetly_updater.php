@@ -46,16 +46,21 @@ function triggerTweet($post_ID)  {
 		return $post_ID;
 	}
 
-	$shortlink = $tweetlyUpdater->getBitlyUrl($thispostlink);
-
-	$sentence = "";
-
+	$buildlink = false;
+	$titleTemplate = "";
+	
+	$category = null;
+	$categories = get_the_category($post_ID);
+	if ($categories > 0) {
+		$category = $categories[0]->cat_name;	
+	}
+	
 	$metaShortLink = get_post_meta($post_ID, "tweetlyUpdater_bitlyUrl", true);
 
 	if ($metaShortLink) {
 		//error_log("This is an update");
 		if(get_option('tweetlyUpdater_oldpost-edited-update') == '1') {
-			$sentence = get_option('tweetlyUpdater_oldpost-edited-text');
+			$titleTemplate = get_option('tweetlyUpdater_oldpost-edited-text');
 			if (strlen(trim($thisposttitle)) == 0) {
 				$post = get_post($post_ID);
 				if ($post) {
@@ -63,33 +68,91 @@ function triggerTweet($post_ID)  {
 				}
 			}
 			if(get_option('tweetlyUpdater_oldpost-edited-showlink') == '1') {
-				$thisposttitle = $thisposttitle . ' ' . $shortlink;
+				$buildlink = true;
 			}
-			$sentence = str_replace ( '#title#', $thisposttitle, $sentence);
+		} else {
+			return $post_ID;
 		}
 	} else {
 		//error_log("This is a new post");
 		if(get_option('tweetlyUpdater_newpost-published-update') == '1'){
-			$sentence = get_option('tweetlyUpdater_newpost-published-text');
+			$titleTemplate = get_option('tweetlyUpdater_newpost-published-text');
 			if(get_option('tweetlyUpdater_newpost-published-showlink') == '1'){
-				$thisposttitle = $thisposttitle . ' ' . $shortlink;
-			}
-			$sentence = str_replace ( '#title#', $thisposttitle, $sentence);
+				$buildlink = true;	
+			}	
+		} else {
+			return $post_ID;
 		}
 	}
+	
+	$shortlink = null;
+	if ($buildlink){
+		$shortlink = $tweetlyUpdater->getBitlyUrl($thispostlink);
+	}
 
-	if($sentence != ""){
-		$status = $sentence;
+	$status = buildTwitterStatus( $titleTemplate, $thisposttitle, $category, $shortlink);	
+	if($status){
 		$res = $tweetlyUpdater->twitterUpdate($status);
 		if ($res == null) {
 			error_log("Twitter update failed");
 		} else {
-			if (!add_post_meta($post_ID, "tweetlyUpdater_bitlyUrl", $shortlink, false))
-			error_log("Could not add bitly url to meta data");
+			if ($buildlink){
+				if (!add_post_meta($post_ID, "tweetlyUpdater_bitlyUrl", $shortlink, false))
+				error_log("Could not add bitly url to meta data");
+			}
 		}
 	}
 	return $post_ID;
 }
+
+function buildTwitterStatus( $titleTemplate, $thisposttitle, $thispostfirstcategory, $link ) {
+	
+	$maxStatusLength = 140;
+	
+	if ($link) {
+		$maxStatusLength = $maxStatusLength - (strlen($link) + 1);
+	}
+	if (ereg("#title#", $titleTemplate)) {
+		$status = str_replace( '#title#', $thisposttitle, $titleTemplate);
+	}
+	if (ereg("#firstcategory#", $titleTemplate)) {
+		if ($thispostfirstcategory) {
+			$status = str_replace ( '#firstcategory#',  $thispostfirstcategory, $status);
+		} else {
+			$status = str_replace ( '#firstcategory#',  "", $status);
+		}
+	}
+	$status = trim_text($status, $maxStatusLength, true, true);
+	if ($link) {
+		$status = $status . ' ' . $link;
+	}
+	
+	return $status;
+}
+
+function trim_text($input, $length, $ellipses = true, $strip_html = true) {
+
+	$input = trim($input);
+
+	if ($strip_html) {
+		$input = html_entity_decode($input);
+		$input = strip_tags($input);
+	}
+ 
+	if (strlen($input) <= $length) {
+		return $input;
+	}
+ 
+	$last_space = strrpos(substr($input, 0, $length), ' ');
+	$trimmed_text = substr($input, 0, $last_space);
+ 
+	if ($ellipses) {
+		$trimmed_text .= '...';
+	}
+ 
+	return $trimmed_text;
+}
+
 
 function addTweetlyOptionsPage() {
 	if (function_exists('add_options_page')) {

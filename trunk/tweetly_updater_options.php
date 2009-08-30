@@ -72,17 +72,17 @@
 <div class="wrap">
 	<h2>Your Tweetly Updater options</h2>
 	
-	<? if ($prereqOK) { ?>
+	<?php if ($prereqOK) { ?>
 	
 	<h3>Your Twitter account details</h3>
 	
-	<? $tweetlyUpdater = new TweetlyUpdater(get_option('tweetlyUpdater_twitterlogin'), get_option('tweetlyUpdater_twitterpw'), get_option('tweetlyUpdater_bitlyuser'), get_option('tweetlyUpdater_bitlyapikey')); ?>
+	<?php $tweetlyUpdater = new TweetlyUpdater(get_option('tweetlyUpdater_twitterlogin'), get_option('tweetlyUpdater_twitterpw'), get_option('tweetlyUpdater_bitlyuser'), get_option('tweetlyUpdater_bitlyapikey')); ?>
 	
 	<fieldset>
 	<legend>Twitter login</legend>
 	<form method="post" >
 	<div>
-		<?
+		<?php
 		if (!$tweetlyUpdater->twitterVerifyCredentials()) {
 			add_action('admin_notices',showAdminMessage("You twitter login could not be verified!", true));
 		}
@@ -107,7 +107,7 @@
 		<legend>bit.ly account data</legend>
 		<form method="post" >
 		<div>
-		<?
+		<?php
 		if (!$tweetlyUpdater->bitlyVerifyCredentials()) {
 			add_action('admin_notices',showAdminMessage("Your bit.ly login could not be verified!", true));
 		}
@@ -166,9 +166,9 @@
 	</div>
 	</form>
 
-	<? } else { ?>
+	<?php } else { ?>
 		<p><strong>The plugin is deactivated, please check error messages above!</strong></p>
-	<? } ?>
+	<?php } ?>
 
 </div>
 
