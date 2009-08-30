@@ -128,6 +128,14 @@
 	</fieldset>
 
 	<h3>Post settings</h3>
+	
+	<p>
+	You can use placholders in your tweet templates.
+	<ul>
+	<li>#title# - Placeholder for page title</li>
+	<li>#firstcategory# - The name of the first category</li>
+	</ul>
+	</p>
 
 	<form method="post">
 	<div>
@@ -138,7 +146,7 @@
 				<label for="newpost-published-update">Update Twitter when the new post is published</label>
 			</p>
 			<p>
-				<label for="newpost-published-text">Text for this Twitter update ( use #title# as placeholder for page title )</label><br />
+				<label for="newpost-published-text">Text for this Twitter update</label><br />
 				<input type="text" name="newpost-published-text" id="newpost-published-text" size="60" maxlength="146" value="<?php echo(get_option('tweetlyUpdater_newpost-published-text')) ?>" />
 				&nbsp;&nbsp;
 				<input type="checkbox" name="newpost-published-showlink" id="newpost-published-showlink" value="1" <?php vc_checkCheckbox('tweetlyUpdater_newpost-published-showlink')?> />
@@ -153,7 +161,7 @@
 				<label for="oldpost-edited-update">Update Twitter when the an old post has been edited</label>
 			</p>
 			<p>
-				<label for="oldpost-edited-text">Text for this Twitter update ( use #title# as placeholder for page title )</label><br />
+				<label for="oldpost-edited-text">Text for this Twitter update</label><br />
 				<input type="text" name="oldpost-edited-text" id="oldpost-edited-text" size="60" maxlength="146" value="<?php echo(get_option('tweetlyUpdater_oldpost-edited-text')) ?>" />
 				&nbsp;&nbsp;
 				<input type="checkbox" name="oldpost-edited-showlink" id="oldpost-edited-showlink" value="1" <?php vc_checkCheckbox('tweetlyUpdater_oldpost-edited-showlink')?> />
