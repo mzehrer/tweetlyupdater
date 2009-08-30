@@ -116,7 +116,7 @@ function buildTwitterStatus( $titleTemplate, $thisposttitle, $thispostfirstcateg
 		$status = str_replace( '#title#', $thisposttitle, $titleTemplate);
 	}
 	if (ereg("#firstcategory#", $titleTemplate)) {
-		if ($thispostfirstcategory) {
+		if ($thispostfirstcategory && $thispostfirstcategory != "Uncategorized") {
 			$status = str_replace ( '#firstcategory#',  $thispostfirstcategory, $status);
 		} else {
 			$status = str_replace ( '#firstcategory#',  "", $status);
