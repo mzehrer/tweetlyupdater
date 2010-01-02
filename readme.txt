@@ -4,13 +4,14 @@ Donate link: http://www.zepan.org/software/
 Tags: twitter, bitly, posting
 Requires at least: 2.6.0
 Tested up to: 2.8.4
-Stable tag: 1.1.3
+Stable tag: 1.2.0
 
 This plugin sends Twitter updates on new or edited posts, uses bit.ly.
 
 == Description ==
 
-Tweetly Updater is a Wordpress plugin that updates Twitter when you create or edit a blog entry, it uses the bit.ly service for short urls. 
+Tweetly Updater is a Wordpress plugin that updates Twitter when you create or edit a blog entry, it uses the bit.ly service for short urls.
+It can use your tags and categories to add hashtags to your tweet
 
 == Installation ==
 
