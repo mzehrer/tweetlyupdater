@@ -3,7 +3,7 @@
  Plugin Name: Tweetly Updater
  Plugin URI: http://www.zepan.org/software/tweetly-updater
  Description: Updates Twitter when you create or edit a blog entry, uses bit.ly for short urls
- Version: 1.2.0
+ Version: 1.2.1
  Author: Michael Zehrer
  Author URI: http://zepan.org
  */
@@ -26,7 +26,11 @@
 
 require "tweetly_updater_api.inc";
 
-function triggerTweet($post_ID)  {
+function triggerEditTweet($post_ID)  {
+  return triggerTweet($post_ID, true);
+}
+
+function triggerTweet($post_ID, $isedit = false)  {
 
   if(!function_exists('json_decode') || !function_exists('curl_exec')) {
     error_log("Can not tweet, essential php functions (json, curl) missing");
@@ -55,9 +59,7 @@ function triggerTweet($post_ID)  {
     $category = $categories[0]->cat_name;	
   }
 
-  $metaShortLink = get_post_meta($post_ID, "tweetlyUpdater_bitlyUrl", true);
-
-  if ($metaShortLink) {
+  if ($isedit) {
     //error_log("This is an update");
     if(get_option('tweetlyUpdater_oldpost-edited-update') == '1') {
       $titleTemplate = get_option('tweetlyUpdater_oldpost-edited-text');
@@ -167,8 +169,6 @@ function buildTwitterStatus( $titleTemplate, $thisposttitle, $thispostfirstcateg
 
 function trim_text($input, $length, $ellipses = true, $strip_html = true) {
 
-  $input = trim($input);
-
   if ($ellipses) {
     $length = $length - 3;
   }
@@ -221,6 +221,12 @@ function showAdminMessage($message, $error = false) {
     . '</strong></p></div>';
 }
 
-add_action('publish_post', 'triggerTweet');
+add_action('future_to_publish', 'triggerTweet', 10, 2);
+add_action('new_to_publish', 'triggerTweet', 10, 2);
+add_action('draft_to_publish', 'triggerTweet',10, 2);
+add_action('pending_to_publish', 'triggerTweet', 10, 2);
+
+add_action('publish_to_publish', 'triggerEditTweet', 10, 1);
+
 add_action('admin_menu', 'addTweetlyOptionsPage');
 ?>
