@@ -7,37 +7,32 @@ class TweetlyUpdater {
     public $twitterSource = "tweetlyupdater";
     public $twitterApiUrl = "http://twitter.com";
     public $debug = false;
-    
-    private $twittereUser;
-    private $twitterPassword;
+
+    private $twitterConsumerKey = "wgrjkYs4d1CAVPMQrqF9NA";
+    private $twitterConsumerSecret = "byB67cTTMV9PdeWELrRn2LzPhk0zM3fLWz3I2k65g";
+    private $twitterConnection;
     private $bitlyUser;
     private $bitlyApiKey;
     
-    function __construct($twittereUser, $twitterPassword, $bitlyUser, $bitlyApiKey) {
-        $this->twittereUser = $twittereUser;
-        $this->twitterPassword = $twitterPassword;
+    function __construct($twitterKey, $twitterSecret, $bitlyUser, $bitlyApiKey) {
+        $this->twitterConnection = new TwitterOAuth($this->twitterConsumerKey, $this->twitterConsumerSecret, $twitterKey, $twitterSecret);
         $this->bitlyUser = $bitlyUser;
         $this->bitlyApiKey = $bitlyApiKey;
     }
 
     public function twitterVerifyCredentials() {
-        $twResp = $this->curlGet($this->twitterApiUrl . "/account/verify_credentials.json",  $this->twittereUser, $this->twitterPassword);
-        $twObject = json_decode($twResp);
+        $twObject = $this->twitterConnection->get("account/verify_credentials");
         if ($twObject->{'name'}) {
                 return true;
         } else {
-                error_log("Twitter auth failed: " . $twResp);    
+                error_log("Twitter auth failed: " . $twObject->{'error'});
         }
         return false;
     }
     
     public function twitterUpdate($message) {
         //error_log("Sending twitter update");
-        $fields = array(    
-            'status'=>urlencode($message),
-            'source'=>$this->twitterSource
-        );
-        $twObject = json_decode($this->curlPost($this->twitterApiUrl ."/statuses/update.json", $fields, $this->twittereUser, $this->twitterPassword));  
+        $twObject =$this->twitterConnection->post('statuses/update', array('status' => $message));
         if ($twObject->{'id'} != null) {
             return  $twObject->{'id'} ;
         } else {
