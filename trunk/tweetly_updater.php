@@ -29,18 +29,23 @@ if (!class_exists('TwitterOAuth')) {
 }
 require_once "tweetly_updater_api.inc";
 
-function triggerEditTweet($post_ID) {
-    return triggerTweet($post_ID, true);
+function triggerEditTweet($thisPost) {
+    return triggerTweet($thisPost, true);
 }
 
-function triggerTweet($post_ID, $isedit = false) {
+function triggerTweet($thisPost, $isedit = false) {
+    $post_ID = $thisPost->ID;
 
     if (!function_exists('json_decode') || !function_exists('curl_exec')) {
         error_log("Can not tweet, essential php functions (json, curl) missing");
-        return $post_ID;
+        return $thisPost;
     }
 
-    $thisPost = get_post($post_ID);
+    $already_tweeted_flag = get_post_meta($post_ID, 'tweetlyUpdater_bitlyUrl', true);
+    if($already_tweeted_flag) {
+      error_log("Post $post_ID has already been published to Twitter before. Skipping.");
+      return $thisPost;
+    }
 
     $thisposttitle = $thisPost->post_title;
     $thispostlink = get_permalink($post_ID);
@@ -50,7 +55,7 @@ function triggerTweet($post_ID, $isedit = false) {
     if (!$tweetlyUpdater->twitterVerifyCredentials()) {
         error_log("Twitter login failed");
         add_action('admin_notices', showAdminMessage("Twitter login failed, the update for this post was not successful.", true));
-        return $post_ID;
+        return $thisPost;
     }
 
     $buildlink = false;
@@ -62,34 +67,27 @@ function triggerTweet($post_ID, $isedit = false) {
         $category = $categories[0]->cat_name;
     }
 
-
     error_log("Post type: " . $thisPost->post_type);
     if ($isedit) {
         error_log("This is an update");
         if (get_option('tweetlyUpdater_oldpost-edited-update') == '1') {
             error_log("tweetlyUpdater_oldpost-edited-skippages: " . get_option('tweetlyUpdater_oldpost-edited-skippages'));
             if ($thisPost->post_type == "page" and  get_option('tweetlyUpdater_oldpost-edited-skippages') == '1') {
-                return $post_ID;
+                return $thisPost;
             }
 
             $titleTemplate = get_option('tweetlyUpdater_oldpost-edited-text');
-            if (strlen(trim($thisposttitle)) == 0) {
-                $post = get_post($post_ID);
-                if ($post) {
-                    $thisposttitle = $post->post_title;
-                }
-            }
             if (get_option('tweetlyUpdater_oldpost-edited-showlink') == '1') {
                 $buildlink = true;
             }
         } else {
-            return $post_ID;
+            return $thisPost;
         }
     } else {
         error_log("This is a new post");
         error_log("tweetlyUpdater_newpost-published-skippages: " . get_option('tweetlyUpdater_newpost-published-skippages'));
-        if ($thisPost->post_type == "page" and  get_option('tweetlyUpdater_newpost-published-skippages') == '1') {
-            return $post_ID;
+        if ($thisPost->post_type == "page" and get_option('tweetlyUpdater_newpost-published-skippages') == '1') {
+            return $thisPost;
         }
 
         if (get_option('tweetlyUpdater_newpost-published-update') == '1') {
@@ -98,7 +96,7 @@ function triggerTweet($post_ID, $isedit = false) {
                 $buildlink = true;
             }
         } else {
-            return $post_ID;
+            return $thisPost;
         }
     }
 
@@ -112,7 +110,7 @@ function triggerTweet($post_ID, $isedit = false) {
     if (get_option('tweetlyUpdater_usehashtags') == '1') {
 
         if (get_option('tweetlyUpdater_usehashtags-cats') == '1') {
-            $categories = get_the_category($post->ID);
+            $categories = get_the_category($post_ID);
             if ($categories) {
                 foreach ($categories as $cat) {
                     $hashtags .= '#' . str_replace(" ", "", strtolower($cat->cat_name)) . ' ';
@@ -136,7 +134,6 @@ function triggerTweet($post_ID, $isedit = false) {
         $hashtags = prepare_text($hashtags);
     }
 
-
     $status = buildTwitterStatus($titleTemplate, $thisposttitle, $category, $shortlink, trim($hashtags));
     if ($status) {
         $res = $tweetlyUpdater->twitterUpdate($status);
@@ -145,11 +142,11 @@ function triggerTweet($post_ID, $isedit = false) {
         } else {
             if ($buildlink) {
                 if (!add_post_meta($post_ID, "tweetlyUpdater_bitlyUrl", $shortlink, false))
-                    error_log("Could not add bitly url to meta data");
+                    error_log("Could not add bitly url to meta data for post $post_ID");
             }
         }
     }
-    return $post_ID;
+    return $thisPost;
 }
 
 function buildTwitterStatus($titleTemplate, $thisposttitle, $thispostfirstcategory, $link, $hashtags) {
@@ -241,10 +238,10 @@ function showAdminMessage($message, $error = false) {
             . '</strong></p></div>';
 }
 
-add_action('future_to_publish', 'triggerTweet', 10, 2);
-add_action('new_to_publish', 'triggerTweet', 10, 2);
-add_action('draft_to_publish', 'triggerTweet', 10, 2);
-add_action('pending_to_publish', 'triggerTweet', 10, 2);
+add_action('future_to_publish', 'triggerTweet', 10, 1);
+add_action('new_to_publish', 'triggerTweet', 10, 1);
+add_action('draft_to_publish', 'triggerTweet', 10, 1);
+add_action('pending_to_publish', 'triggerTweet', 10, 1);
 
 add_action('publish_to_publish', 'triggerEditTweet', 10, 1);
 
