@@ -1,0 +1,3 @@
+# The active development on this plugin was stopped, but patches are welcome. #
+
+**Tweetly Updater** is a [Wordpress](http://wordpress.org) plugin that updates [Twitter](http://twitter.com) when you create or edit a blog entry. It uses the [bit.ly](http://bit.ly) service for short urls. The plugin uses bit.ly with the history option, so you can track the clicks on the urls inside your twitter posts on your bit.ly homepage. It can use your tags and categories to add hashtags to your tweet.
